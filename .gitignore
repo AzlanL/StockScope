@@ -1,4 +1,15 @@
-.env
+# Virtual Environment
 venv/
+ENV/
+
+# Environment Variables (Keep API keys secret)
+.env
+
+# Python Cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# IDE Configuration
+.vscode/
+.idea/

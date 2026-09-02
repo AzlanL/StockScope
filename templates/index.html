@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html lang="en"> #webpage language english
+<html lang="en"> <!-- webpage language english -->
 <head>
-    <meta charset="UTF-8"> #character encoding
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> #scales the page depending on device width
-    <title>StockScope | Market Dashboard</title> #page title
+    <meta charset="UTF-8"> <!-- character encoding -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- scales the page depending on device width -->
+    <title>StockScope | Market Dashboard</title> <!-- page title -->
     <!-- Chart.js CDN for plotting -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> #allows for chart plotting and interactive graphs
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- allows for chart plotting and interactive graphs -->
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; #dark mode theme and aesthetics
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #0f172a; 
             color: #f8fafc;
             margin: 0;
             padding: 2rem;
         }
-        .container { #centers the content and sets a max width for better readability
+        .container { 
             max-width: 1000px;
             margin: 0 auto;
         }
-        .search-box { #aligns text input box and button horizontally with a gap between them
+        .search-box {
             display: flex;
             gap: 1rem;
             margin-bottom: 2rem;
         }
-        input { #styles the search input box with the dark theme
+        /*styles the search box with the dark theme*/
+        input { 
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
             border: 1px solid #334155;
@@ -41,39 +42,39 @@
             font-weight: bold;
             cursor: pointer;
         }
-        button:hover { #action button that darkens when you hover over it
+        button:hover { /*action button that darkens when you hover over it*/
             background-color: #2563eb;
         }
-        .chart-container { #box around the stock chart with padding and border radius for aesthetics
+        .chart-container { /*box around the stock chart with padding and border radius for aesthetics*/
             background-color: #1e293b;
             padding: 1.5rem;
             border-radius: 0.75rem;
             border: 1px solid #334155;
         }
-        #error-message { #error message that appears when the user inputs an invalid stock ticker, styled in red and hidden by default
+        #error-message { /*error message that appears when the user inputs an invalid stock ticker, styled in red and hidden by default*/
             color: #ef4444;
             margin-bottom: 1rem;
             display: none;
         }
     </style>
 </head>
-<body> #visible page content
-    <div class="container"> #opens the main container and displays the main title of the webpage
+<body> <!-- visible page content -->
+    <div class="container"> <!-- opens the main container and displays the main title of the webpage -->
         <h1>StockScope Market Dashboard</h1>
         
-        <div class="search-box"> #search box for entering stock tickers
+        <div class="search-box"> <!-- search box for entering stock tickers -->
             <input type="text" id="ticker-input" placeholder="Enter stock ticker (e.g., AAPL, IBM, TSLA)" value="IBM">
             <button id="search-btn">Analyze Stock</button>
         </div>
 
-        <div id="error-message"></div> #placeholder for error messages that will be displayed if the user inputs an invalid stock ticker
+        <div id="error-message"></div> <!-- placeholder for error messages that will be displayed if the user inputs an invalid stock ticker -->
 
-        <div class="chart-container"> #canvas allows interactive graphs to be displayed on the webpage, where the stock data will be plotted
+        <div class="chart-container"> <!-- canvas allows interactive graphs to be displayed on the webpage, where the stock data will be plotted -->
             <canvas id="stockChart"></canvas>
         </div>
     </div>
 
     <!-- Link to static JavaScript -->
-    <script src="{{ url_for('static', filename='main.js') }}"></script> #generate url path to javascript file inside static folder, which contains the logic for fetching stock data and plotting it on the chart
+    <script src="{{ url_for('static', filename='main.js') }}"></script> <!-- generate url path to javascript file inside static folder, which contains the logic for fetching stock data and plotting it on the chart -->
 </body>
 </html>
