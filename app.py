@@ -51,14 +51,23 @@ def fetch_and_process_stock(symbol):
     
     # 6. PANDAS MATH: Calculate 50-day Simple Moving Average (SMA)
     df['SMA_50'] = df['close'].rolling(window=50).mean()
-    
+
+    # 6a. PANDAS MATH: Daily percentage change (how much the price moved vs the previous day)
+    df['daily_pct_change'] = df['close'].pct_change() * 100 #the daily percentage change column is calculated by using the close price and calculating the percentage change across days
+
+    # 6b. PANDAS MATH: volatility is the standard deviation of daily % change over a 20-day window
+    df['volatility'] = df['daily_pct_change'].rolling(window=20).std() #sliding window of 20 consecutive days and std finds the standard deviation of the daily percentage change
+
+
     # 7. Format clean output dictionary to send to frontend
     processed_data = {
         "symbol": symbol.upper(), #capitalises the symbol to make it look nice on the frontend
         "dates": df.index.strftime('%Y-%m-%d').tolist(), #turns dates into clean text strings
         "prices": df['close'].tolist(), # extracts the closing prices from the DataFrame and converts them into a list
         "sma_20": df['SMA_20'].fillna("").tolist(),  # marks first 19 days as not a number and turns into empty strings to avoid confusion on the frontend and converts them into a list
-        "sma_50": df['SMA_50'].fillna("").tolist()
+        "sma_50": df['SMA_50'].fillna("").tolist(),
+        "latest_change_pct": round(df['daily_pct_change'].iloc[-1], 2),  # most recent day's % change, rounded to 2 decimal places
+        "volatility": round(df['volatility'].iloc[-1], 2)  # most recent volatility figure, rounded to 2 decimal places
     }
     
     return processed_data, None # returns the processed data and None for error message since there is no error

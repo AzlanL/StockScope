@@ -52,14 +52,16 @@ function renderChart(data) { //renders the stock chart using Chart.js with the d
                 },
                 {
                     label: '20-Day SMA', //20 day average of the average price of the stock over the past 20 days
-                    data: data.sma_20,
+                    // Convert empty strings from Pandas into null so Chart.js skips plotting them
+                    data: data.sma_20.map(val => val === "" ? null : val),
                     borderColor: '#f59e0b',
                     borderWidth: 1.5,
                     pointRadius: 0
                 },
                 {
                     label: '50-Day SMA', //50 days average of the average price of the stock over the past 50 days
-                    data: data.sma_50,
+                    // Convert empty strings from Pandas into null so Chart.js skips plotting them
+                    data: data.sma_50.map(val => val === "" ? null : val),
                     borderColor: '#10b981',
                     borderWidth: 1.5,
                     pointRadius: 0
