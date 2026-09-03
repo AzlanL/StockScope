@@ -25,11 +25,25 @@ async function fetchStockData(symbol) { //fetches stock data from the backend AP
         }
 
         renderChart(result.data); //renders the stock chart using the data returned from the API
+        updateStatsPanel(result.data); //updated the stats panel with the latest price, daily change, and volatility using the data returned from the API
     } catch (err) { //any other errors that occur during the fetch or parsing process are caught and displayed in the error div
         errorDiv.textContent = 'Network error. Please try again.';
         errorDiv.style.display = 'block';
     }
 }
+ //display of the key stats is updated with the latest data from the API
+function updateStatsPanel(data) { //updates the three stat boxes with the latest price, daily % change, and volatility
+    const latestPrice = data.prices[data.prices.length - 1]; //the last item in the prices array is the most recent closing price
+    document.getElementById('stat-price').textContent = `$${latestPrice.toFixed(2)}`; //formats the latest price to two decimal places and adds a dollar sign in front
+
+    const changeEl = document.getElementById('stat-change'); //changeEl is the element that will display the daily percentage change in price
+    const change = data.latest_change_pct; //the latest_change_pct is the most recent day's percentage change in price, which is calculated in the backend and sent to the frontend as part of the API response
+    changeEl.textContent = `${change > 0 ? '+' : ''}${change}%`; //adds a + sign in front if positive, negative numbers already show their own minus sign
+    changeEl.className = 'stat-value ' + (change >= 0 ? 'positive' : 'negative'); //applies the green or red class depending on sign
+
+    document.getElementById('stat-volatility').textContent = `${data.volatility}%`; //formats the volatility to two decimal places and adds a percentage sign
+}
+
 
 function renderChart(data) { //renders the stock chart using Chart.js with the data returned from the API
     const ctx = document.getElementById('stockChart').getContext('2d'); //ctx is the context of the canvas element where the chart will be drawn
