@@ -45,6 +45,34 @@
         button:hover { /*action button that darkens when you hover over it*/
             background-color: #2563eb;
         }
+
+        .stats-panel { /*stats panel design for displaying the latest price, daily change, and volatility of the stock*/
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            flex-grow: 1;
+        }
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+
+
         .chart-container { /*box around the stock chart with padding and border radius for aesthetics*/
             background-color: #1e293b;
             padding: 1.5rem;
@@ -68,6 +96,21 @@
         </div>
 
         <div id="error-message"></div> <!-- placeholder for error messages that will be displayed if the user inputs an invalid stock ticker -->
+
+    <div class="stats-panel">
+        <div class="stat">
+            <span class="stat-label">Latest Price</span> <!-- panel with latest price -->
+            <span class="stat-value" id="stat-price">--</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">Daily Change</span> <!-- panel with daily change in price -->
+            <span class="stat-value" id="stat-change">--</span>
+        </div>
+        <div class="stat">
+            <span class="stat-label">Volatility (20d)</span> <!--  panel with 20day volatility using standard deviation of daily percentage change -->
+            <span class="stat-value" id="stat-volatility">--</span>
+        </div>
+    </div>
 
         <div class="chart-container"> <!-- canvas allows interactive graphs to be displayed on the webpage, where the stock data will be plotted -->
             <canvas id="stockChart"></canvas>
