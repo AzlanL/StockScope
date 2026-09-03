@@ -48,6 +48,17 @@ function updateStatsPanel(data) { //updates the three stat boxes with the latest
 function renderChart(data) { //renders the stock chart using Chart.js with the data returned from the API
     const ctx = document.getElementById('stockChart').getContext('2d'); //ctx is the context of the canvas element where the chart will be drawn
 
+    const goldenCrosses = data.dates.map(date => { //new array of prices where a golden cross occurred, or null if no golden cross occurred on that date
+        const match = data.crossovers.find(c => c.date === date && c.type === 'golden'); //finds the crossover entry for the given date and type (date and golden)
+        return match ? match.price : null;
+    });
+    const deathCrosses = data.dates.map(date => { //
+        const match = data.crossovers.find(c => c.date === date && c.type === 'death'); //finds the crossover entry for the given date and type
+        return match ? match.price : null;
+    });
+
+
+
     if (stockChart) { //if a chart already exists, destroy it before creating a new one to avoid overlapping charts
         stockChart.destroy();
     }
@@ -56,7 +67,7 @@ function renderChart(data) { //renders the stock chart using Chart.js with the d
         type: 'line',
         data: {
             labels: data.dates,
-            datasets: [
+            datasets: [ //array of datasets to be plotted on the chart, each with its own label, data, and styling options
                 { //below makes a line graph with blue for daily close, orange for 20-day SMA, and green for 50-day SMA
                     label: `${data.symbol} Daily Close`, //daily close is the price of the stock at the end of the trading day
                     data: data.prices,
@@ -79,6 +90,25 @@ function renderChart(data) { //renders the stock chart using Chart.js with the d
                     borderColor: '#10b981',
                     borderWidth: 1.5,
                     pointRadius: 0
+                },
+                {
+                    label: 'Golden Cross', //point where 20 day SMA crosses above 50 day SMA, which is a bullish signal that the stock price may rise
+                    data: goldenCrosses,
+                    borderColor: '#10b981',
+                    backgroundColor: '#10b981',
+                    pointRadius: 8,
+                    pointStyle: 'triangle',
+                    showLine: false // only show the marker dots, not a connecting line for all null values
+                },
+                {
+                    label: 'Death Cross', //point where 20 day SMA crosses below 50 day SMA, which is a bearish signal that the stock price may fall
+                    data: deathCrosses,
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    pointRadius: 8,
+                    pointStyle: 'triangle',
+                    rotation: 180, // flips the triangle upside-down to visually distinguish it from golden crosses
+                    showLine: false
                 }
             ]
         },
