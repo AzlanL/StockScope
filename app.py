@@ -58,6 +58,18 @@ def fetch_and_process_stock(symbol):
     # 6b. PANDAS MATH: volatility is the standard deviation of daily % change over a 20-day window
     df['volatility'] = df['daily_pct_change'].rolling(window=20).std() #sliding window of 20 consecutive days and std finds the standard deviation of the daily percentage change
 
+    # 6c. Detect moving average crossovers: find where SMA_20 changes from below to above SMA_50, or vice versa
+    df['sma20_above_sma50'] = df['SMA_20'] > df['SMA_50']  #column that is True when SMA_20 is above SMA_50 and False when SMA_20 is below SMA_50
+    df['crossover'] = df['sma20_above_sma50'].diff()  #flags where this True/False value changed from the previous day in crossover column showing values of 1 (golden cross), -1 (death cross), or 0 (no change)
+
+    crossovers = []
+    for date, row in df[df['crossover'].notna() & (df['crossover'] != False)].iterrows(): #filters the DataFrame to only include rows where a crossover occurred (not NaN and not False) and iterates over those rows
+        crossovers.append({ #adds a dictionary to the crossovers list with the date, price, and type of crossover
+            "date": date.strftime('%Y-%m-%d'),
+            "price": round(row['close'], 2),
+            "type": "golden" if row['sma20_above_sma50'] else "death" #golden cross if SMA_20 is above SMA_50, death cross if SMA_20 is below SMA_50
+        })
+
 
     # 7. Format clean output dictionary to send to frontend
     processed_data = {
@@ -67,7 +79,8 @@ def fetch_and_process_stock(symbol):
         "sma_20": df['SMA_20'].fillna("").tolist(),  # marks first 19 days as not a number and turns into empty strings to avoid confusion on the frontend and converts them into a list
         "sma_50": df['SMA_50'].fillna("").tolist(),
         "latest_change_pct": round(df['daily_pct_change'].iloc[-1], 2),  # most recent day's % change, rounded to 2 decimal places
-        "volatility": round(df['volatility'].iloc[-1], 2)  # most recent volatility figure, rounded to 2 decimal places
+        "volatility": round(df['volatility'].iloc[-1], 2),  # most recent volatility figure, rounded to 2 decimal places
+        "crossovers": crossovers  # list of detected crossovers
     }
     
     return processed_data, None # returns the processed data and None for error message since there is no error
