@@ -10,6 +10,27 @@ app = Flask(__name__) #creates a new Flask web application instance
 
 API_KEY = os.getenv("ALPHA_VANTAGE_KEY") #gets the API key from the .env file without revealing it in the code
 
+
+def detect_crossovers(df): #standalone function that takes a DataFrame as input and returns a list of crossover points
+    """
+    Given a DataFrame with 'SMA_20', 'SMA_50', and 'close' columns,
+    return a list of dicts marking every point where SMA_20 crosses
+    above (golden cross) or below (death cross) SMA_50.
+    """
+    df = df.copy()  # acreates an independant copy of the data frame to avoid modifying the original DataFrame in place
+    df['sma20_above_sma50'] = df['SMA_20'] > df['SMA_50'] #evaluates whether the 20-day SMA is above the 50-day SMA for each row in the DataFrame and stores the result as a boolean column
+    df['crossover'] = df['sma20_above_sma50'].diff() #1, 0, or -1 values when the boolean switches from true to false or vice versa, indicating a crossover event
+
+    crossovers = [] #empty list to store detected crossover event
+    for date, row in df[df['crossover'].notna() & (df['crossover'] != False)].iterrows(): #filters dataframe to only keep the rows where a crossover happened
+        crossovers.append({ #makes formatted dictionary
+            "date": date.strftime('%Y-%m-%d'),
+            "price": round(row['close'], 2),
+            "type": "golden" if row['sma20_above_sma50'] else "death"
+        })
+    return crossovers
+
+
 def fetch_and_process_stock(symbol):
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
     response = requests.get(url) #sends a GET request to the API and stores the response in a variable
@@ -59,16 +80,7 @@ def fetch_and_process_stock(symbol):
     df['volatility'] = df['daily_pct_change'].rolling(window=20).std() #sliding window of 20 consecutive days and std finds the standard deviation of the daily percentage change
 
     # 6c. Detect moving average crossovers: find where SMA_20 changes from below to above SMA_50, or vice versa
-    df['sma20_above_sma50'] = df['SMA_20'] > df['SMA_50']  #column that is True when SMA_20 is above SMA_50 and False when SMA_20 is below SMA_50
-    df['crossover'] = df['sma20_above_sma50'].diff()  #flags where this True/False value changed from the previous day in crossover column showing values of 1 (golden cross), -1 (death cross), or 0 (no change)
-
-    crossovers = []
-    for date, row in df[df['crossover'].notna() & (df['crossover'] != False)].iterrows(): #filters the DataFrame to only include rows where a crossover occurred (not NaN and not False) and iterates over those rows
-        crossovers.append({ #adds a dictionary to the crossovers list with the date, price, and type of crossover
-            "date": date.strftime('%Y-%m-%d'),
-            "price": round(row['close'], 2),
-            "type": "golden" if row['sma20_above_sma50'] else "death" #golden cross if SMA_20 is above SMA_50, death cross if SMA_20 is below SMA_50
-        })
+    crossovers = detect_crossovers(df)
 
 
     # 7. Format clean output dictionary to send to frontend
