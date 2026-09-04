@@ -32,6 +32,7 @@ def detect_crossovers(df): #standalone function that takes a DataFrame as input 
 
 
 def fetch_and_process_stock(symbol):
+    print(f"DEBUG: API_KEY is currently: '{API_KEY}'")  #TEMPORARY - remove after debugging
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
     response = requests.get(url) #sends a GET request to the API and stores the response in a variable
 
