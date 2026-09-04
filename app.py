@@ -33,10 +33,8 @@ def detect_crossovers(df): #standalone function that takes a DataFrame as input 
 
 
 def fetch_and_process_stock(symbol):
-    print(f"DEBUG: API_KEY is currently: '{API_KEY}'")  #TEMPORARY - remove after debugging
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
     response = requests.get(url) #sends a GET request to the API and stores the response in a variable
-    print(f"DEBUG: Raw API response: {response.json()}")  # TEMPORARY - remove after debugging
 
     if response.status_code != 200: #checks if the request was successful as 200 is success code
         return None, "Failed to connect to market data provider (alphavantage)"
@@ -44,7 +42,7 @@ def fetch_and_process_stock(symbol):
     data = response.json() #converts the json response into a python dictionary
 
     if "Time Series (Daily)" not in data: #checks if the expected data is present in the response
-        if "Note" in data: #means the api has reaches the free limit for the day
+        if "Note" in data or "Information" in data: #means the api has reaches the free limit for the day (first checked for note but now checked for both after debugging)
             return None, "API rate limit reached. Please wait a minute."
         return None, f"Invalid symbol or data unavailable for '{symbol}'." #if we dont have time series daily and we dont have note then we have an invalid symbol or the data is unavailable
 

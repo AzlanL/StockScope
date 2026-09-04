@@ -136,5 +136,3 @@ function renderChart(data) { //renders the stock chart using Chart.js with the d
         }
     });
 }
-
-fetchStockData('IBM'); //calls the fuction when the page loads so the chart isnt empty when you first open the site
