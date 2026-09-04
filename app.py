@@ -1,4 +1,5 @@
-import os #allows python to read variables from the .env file
+import os
+from urllib import response #allows python to read variables from the .env file
 import requests #handles HTTP requests to get data from the API
 import pandas as pd #allows us to manipulate the data we get from the API to reduce time taken
 from flask import Flask, jsonify, render_template #allows us to create a web application and return data in JSON format anf render HTML templates
@@ -35,6 +36,7 @@ def fetch_and_process_stock(symbol):
     print(f"DEBUG: API_KEY is currently: '{API_KEY}'")  #TEMPORARY - remove after debugging
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
     response = requests.get(url) #sends a GET request to the API and stores the response in a variable
+    print(f"DEBUG: Raw API response: {response.json()}")  # TEMPORARY - remove after debugging
 
     if response.status_code != 200: #checks if the request was successful as 200 is success code
         return None, "Failed to connect to market data provider (alphavantage)"
