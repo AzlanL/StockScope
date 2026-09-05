@@ -43,7 +43,7 @@ def fetch_and_process_stock(symbol):
 
     if "Time Series (Daily)" not in data: #checks if the expected data is present in the response
         if "Note" in data or "Information" in data: #means the api has reaches the free limit for the day (first checked for note but now checked for both after debugging)
-            return None, "API rate limit reached. Please wait a minute."
+                    return None, "Daily API rate limit reached (25 requests/day on the free tier). Please try again tomorrow."
         return None, f"Invalid symbol or data unavailable for '{symbol}'." #if we dont have time series daily and we dont have note then we have an invalid symbol or the data is unavailable
 
     time_series = data["Time Series (Daily)"] #extracts the daily time series data from the response data
