@@ -11,6 +11,10 @@ app = Flask(__name__) #creates a new Flask web application instance
 
 API_KEY = os.getenv("ALPHA_VANTAGE_KEY") #gets the API key from the .env file without revealing it in the code
 
+import time
+
+CACHE = {}  #empty dictionary that stores each ticker fetched and the time it was fetched, along with the processed data.
+CACHE_DURATION_SECONDS = 300  #how long a cached result stays valid (5 minutes)
 
 def detect_crossovers(df): #standalone function that takes a DataFrame as input and returns a list of crossover points
     """
@@ -33,6 +37,15 @@ def detect_crossovers(df): #standalone function that takes a DataFrame as input 
 
 
 def fetch_and_process_stock(symbol):
+
+    symbol = symbol.upper()  #"aapl" and "AAPL" share the same cache entry
+
+    if symbol in CACHE:
+        age = time.time() - CACHE[symbol]["timestamp"] #age is the time since the data was cached in seconds
+        if age < CACHE_DURATION_SECONDS: #if the cached data is still valid (less than 5 minutes old), return it
+            print("Cache Accessed.")
+            return CACHE[symbol]["data"], None  #uses cache not API 
+
     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
     response = requests.get(url) #sends a GET request to the API and stores the response in a variable
 
@@ -95,7 +108,8 @@ def fetch_and_process_stock(symbol):
         "volatility": round(df['volatility'].iloc[-1], 2),  # most recent volatility figure, rounded to 2 decimal places
         "crossovers": crossovers  # list of detected crossovers
     }
-    
+
+    CACHE[symbol] = {"data": processed_data, "timestamp": time.time()}  # store this result using data processed and time accessed for future requests
     return processed_data, None # returns the processed data and None for error message since there is no error
 
 
