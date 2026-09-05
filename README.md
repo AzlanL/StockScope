@@ -1,9 +1,9 @@
 # StockScope
 
-A full-stack stock market dashboard — enter a ticker, get a live price chart with moving averages, automatic golden/death cross detection, and key stats, all computed server-side and rendered interactively in the browser.
+A full-stack stock market dashboard. Enter a ticker, get a live price chart with moving averages, automatic golden/death cross detection, and key stats, all computed server-side and rendered interactively in the browser.
 
 **Live demo:** https://stockscope-uig4.onrender.com
-*(Free-tier hosting — the first load after a period of inactivity may take 20–30 seconds to wake up.)*
+*(Free-tier hosting, so the first load after a period of inactivity may take 20–30 seconds to wake up.)*
 
 ![StockScope dashboard](screenshot.png) ADD SCREENSHOT AFTER API LIMIT RESET
 
