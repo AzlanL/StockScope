@@ -18,6 +18,7 @@ A full-stack stock market dashboard. Enter a ticker, get a live price chart with
 - Frontend (Chart.js) renders price + moving averages, with crossover points marked directly on the chart, alongside a live stats panel (latest price, daily % change, volatility)
 - In-memory caching reduces repeated calls to the data provider for recently-searched tickers
 - Backend logic is covered by automated unit tests (pytest)
+- `test_api.py` is a standalone script for checking the Alpha Vantage API connection directly, separate from the Flask app — useful for debugging connectivity or rate-limit issues in isolation.
 
 ## Tech stack
 
