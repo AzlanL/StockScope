@@ -1,15 +1,15 @@
-# Virtual Environment
+#Virtual Environment
 venv/
 ENV/
 
-# Environment Variables (Keep API keys secret)
+#Environment Variables (Keep API keys secret) (File was removed after switching from AlphaVantage API to yfinance)
 .env
 
-# Python Cache
+#Python Cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# IDE Configuration
+#IDE Configuration
 .vscode/
 .idea/

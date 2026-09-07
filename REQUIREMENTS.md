@@ -7,7 +7,7 @@ to an interactive frontend for visualization.
 
 ## Core features
 - User enters a US stock ticker (e.g. AAPL, TSLA) into an input field
-- Backend fetches daily price history from Alpha Vantage
+- Backend fetches daily price history via yfinance
 - Backend computes:
 	- 20-day and 50-day simple moving averages
 	- Daily percentage change
@@ -27,7 +27,7 @@ to an interactive frontend for visualization.
 - User accounts, saved watchlists, or persistence of any kind
 
 ## Tech stack
-- Backend: Python, Flask, pandas, requests, python-dotenv
+- Backend: Python, Flask, pandas, yfinance
 - Frontend: HTML, CSS, JavaScript, Chart.js
 - Data source: Alpha Vantage free API
 

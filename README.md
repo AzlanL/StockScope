@@ -18,13 +18,12 @@ A full-stack stock market dashboard. Enter a ticker, get a live price chart with
 - Frontend (Chart.js) renders price + moving averages, with crossover points marked directly on the chart, alongside a live stats panel (latest price, daily % change, volatility)
 - In-memory caching reduces repeated calls to the data provider for recently-searched tickers
 - Backend logic is covered by automated unit tests (pytest)
-- `test_api.py` is a standalone script for checking the Alpha Vantage API connection directly, separate from the Flask app — useful for debugging connectivity or rate-limit issues in isolation.
 
 ## Tech stack
 
 - **Backend:** Python, Flask, pandas, requests, python-dotenv
 - **Frontend:** HTML, CSS, JavaScript, Chart.js
-- **Data source:** Alpha Vantage (free tier)
+- **Data source:** Yahoo Finance (via yfinance)
 - **Testing:** pytest
 - **Deployment:** Render
 
@@ -37,10 +36,6 @@ python -m venv venv
 venv\Scripts\activate          # Windows
 pip install -r requirements.txt
 ```
-
-Get a free API key from [Alpha Vantage](https://www.alphavantage.co/support/#api-key), then create a `.env` file in the project root:
-
-ALPHA_VANTAGE_KEY=your_key_here
 
 Run it:
 ```bash
@@ -55,6 +50,5 @@ pytest
 
 ## Known limitations
 
-- Alpha Vantage's free tier is limited to 25 requests/day per API key — the in-memory cache helps, but heavy use can still hit this limit
 - The cache resets whenever the server process restarts (e.g. on redeploy, or after Render's free-tier instance sleeps from inactivity)
 - US stock tickers only; no cryptocurrency support

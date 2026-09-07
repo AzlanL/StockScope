@@ -1,15 +1,8 @@
-import os
-from urllib import response #allows python to read variables from the .env file
-import requests #handles HTTP requests to get data from the API
-import pandas as pd #allows us to manipulate the data we get from the API to reduce time taken
+import pandas as pd #allows us to manipulate the data we get from yfinance to reduce time taken
+import yfinance as yf #fetches live stock market data, no API key required
 from flask import Flask, jsonify, render_template #allows us to create a web application and return data in JSON format anf render HTML templates
-from dotenv import load_dotenv #loads the .env file and makes the variables available to the script
-
-load_dotenv() #loads the .env variables
 
 app = Flask(__name__) #creates a new Flask web application instance
-
-API_KEY = os.getenv("ALPHA_VANTAGE_KEY") #gets the API key from the .env file without revealing it in the code
 
 import time
 
@@ -46,58 +39,31 @@ def fetch_and_process_stock(symbol):
             print("Cache Accessed.")
             return CACHE[symbol]["data"], None  #uses cache not API 
 
-    url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={API_KEY}" #where to get stock data from
-    response = requests.get(url) #sends a GET request to the API and stores the response in a variable
+    ticker = yf.Ticker(symbol) #ticker object using yfinance library to fetch data for the given symbol
+    df = ticker.history(period="6mo")  #6 months of daily price history as a pandas dataframe
 
-    if response.status_code != 200: #checks if the request was successful as 200 is success code
-        return None, "Failed to connect to market data provider (alphavantage)"
+    if df.empty:  #yfinance returns an empty DataFrame for invalid tickers, rather than an error
+        return None, f"Invalid symbol or data unavailable for '{symbol}'."
 
-    data = response.json() #converts the json response into a python dictionary
-
-    if "Time Series (Daily)" not in data: #checks if the expected data is present in the response
-        if "Note" in data or "Information" in data: #means the api has reaches the free limit for the day (first checked for note but now checked for both after debugging)
-                    return None, "Daily API rate limit reached (25 requests/day on the free tier). Please try again tomorrow."
-        return None, f"Invalid symbol or data unavailable for '{symbol}'." #if we dont have time series daily and we dont have note then we have an invalid symbol or the data is unavailable
-
-    time_series = data["Time Series (Daily)"] #extracts the daily time series data from the response data
-
-    # 1. Convert python dictionary into a pandas DataFrame for easier manipulation and analysis and treat dates as table rows
-    df = pd.DataFrame.from_dict(time_series, orient='index')
+    df = df.rename(columns={'Close': 'close', 'Open': 'open'})  #match the lowercase column names used elsewhere in this function
     
-    # 2. Clean up column names (Alpha Vantage names columns like '4. close')
-    df = df.rename(columns={
-        '1. open': 'open', #renames 1. open to open and so on
-        '2. high': 'high',
-        '3. low': 'low',
-        '4. close': 'close',
-        '5. volume': 'volume'
-    })
+    # 1. PANDAS MATH: Calculate 20-day Simple Moving Average (SMA)
+    df['SMA_20'] = df['close'].rolling(window=20).mean() #sliding window of 20 consecutive days and mean finds the average of the closing prices
     
-    # 3. Convert string numbers into actual floating-point numbers as JSON returns numbers as strings and we need to do math on them
-    df['close'] = pd.to_numeric(df['close'])
-    df['open'] = pd.to_numeric(df['open'])
-    
-    # 4. Sort dates chronologically (Alpha Vantage gives newest-first)
-    df.index = pd.to_datetime(df.index)
-    df = df.sort_index()
-    
-    # 5. PANDAS MATH: Calculate 20-day Simple Moving Average (SMA)
-    df['SMA_20'] = df['close'].rolling(window=20).mean() # sliding window of 20 consecutive days and mean finds the average of the closing prices
-    
-    # 6. PANDAS MATH: Calculate 50-day Simple Moving Average (SMA)
+    # 2. PANDAS MATH: Calculate 50-day Simple Moving Average (SMA)
     df['SMA_50'] = df['close'].rolling(window=50).mean()
 
-    # 6a. PANDAS MATH: Daily percentage change (how much the price moved vs the previous day)
+    # 2a. PANDAS MATH: Daily percentage change (how much the price moved vs the previous day)
     df['daily_pct_change'] = df['close'].pct_change() * 100 #the daily percentage change column is calculated by using the close price and calculating the percentage change across days
 
-    # 6b. PANDAS MATH: volatility is the standard deviation of daily % change over a 20-day window
+    # 2b. PANDAS MATH: volatility is the standard deviation of daily % change over a 20-day window
     df['volatility'] = df['daily_pct_change'].rolling(window=20).std() #sliding window of 20 consecutive days and std finds the standard deviation of the daily percentage change
 
-    # 6c. Detect moving average crossovers: find where SMA_20 changes from below to above SMA_50, or vice versa
+    # 2c. Detect moving average crossovers: find where SMA_20 changes from below to above SMA_50, or vice versa
     crossovers = detect_crossovers(df)
 
 
-    # 7. Format clean output dictionary to send to frontend
+    # 3. Format clean output dictionary to send to frontend
     processed_data = {
         "symbol": symbol.upper(), #capitalises the symbol to make it look nice on the frontend
         "dates": df.index.strftime('%Y-%m-%d').tolist(), #turns dates into clean text strings
