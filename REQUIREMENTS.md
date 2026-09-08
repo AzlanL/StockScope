@@ -29,7 +29,7 @@ to an interactive frontend for visualization.
 ## Tech stack
 - Backend: Python, Flask, pandas, yfinance
 - Frontend: HTML, CSS, JavaScript, Chart.js
-- Data source: Alpha Vantage free API
+- Data source: yfinance (Yahoo Finance)
 
 ## Success criteria
 A user can enter a valid ticker and see, within a few seconds, an

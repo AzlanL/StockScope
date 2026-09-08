@@ -5,7 +5,7 @@ A full-stack stock market dashboard. Enter a ticker, get a live price chart with
 **Live demo:** https://stockscope-uig4.onrender.com
 *(Free-tier hosting, so the first load after a period of inactivity may take 20–30 seconds to wake up.)*
 
-![StockScope dashboard](screenshot.png) ADD SCREENSHOT AFTER API LIMIT RESET
+![StockScope dashboard](screenshot.png)
 
 ## What it does
 
@@ -21,7 +21,7 @@ A full-stack stock market dashboard. Enter a ticker, get a live price chart with
 
 ## Tech stack
 
-- **Backend:** Python, Flask, pandas, requests, python-dotenv
+- **Backend:** Python, Flask, pandas, yfinance
 - **Frontend:** HTML, CSS, JavaScript, Chart.js
 - **Data source:** Yahoo Finance (via yfinance)
 - **Testing:** pytest
